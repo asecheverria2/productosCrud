@@ -3,8 +3,10 @@ const mysql = require('mysql');
 const cron = require('node-cron');
 
 const accountSid = 'ACbda70f08f4a8ee692669aec9f7de77f8';
-const authToken = '7a39fe5efad633303ca1c4d4c8b6615f';
+const authToken = '3126d17d868b6f93e383f63a3bce57ed';
 const client = require('twilio')(accountSid, authToken);
+
+const nodemailer = require('nodemailer');
 
 const app = express();
 app.use(express.json());
@@ -106,12 +108,57 @@ app.delete('/productos/:id', (req, res) => {
 app.listen(3000, () => {
     console.log('Servidor iniciado en el puerto 3000');
 });
+
+//funcion de nodemailer
+enviar_mail = (mensaje) => {
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'perugachisebastian63@gmail.com',
+            pass: 'xrkopnrmqvjbmnlz'
+        }
+    });
+    let mail_options = {
+        from: '"NProductos" <perugachisebastian63@gmail.co>',
+        to: 'echeverriapas@gmail.com',
+        subject: 'Informacion de Caducidad de producto',
+        html: `
+            <table border="0" cellpadding="0" cellspacing="0" width="600px" background-color="#2d3436" bgcolor="#2d3436">
+                <tr height="200px">  
+                    <td bgcolor="" width="600px">
+                        <h1 style="color: #fff; text-align:center">Bienvenido</h1>
+                        <p  style="color: #fff; text-align:center">
+                            <span style="color: #e84393">${mensaje}</span> 
+                        </p>
+                    </td>
+                </tr>
+                <tr bgcolor="#fff">
+                    <td style="text-align:center">
+                        <p style="color: #000">¡Un mundo de servicios a su disposición!</p>
+                    </td>
+                </tr>
+            </table>
+        `
+    };
+    transporter.sendMail(mail_options, (error, info) => {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('El correo se envío correctamente ' + info.response);
+        }
+    });
+};
+
+
+//funcion para agregar 0 a un numero menor a 10
 function pad(number) {
     if (number < 10) {
       return '0' + number;
     }
     return number;
   }
+
+//funcion para automatizar el envio de mensajes'5 * * * * *'
 cron.schedule('5 * * * * *', ()=>{
     var res=[];
     const query = 'SELECT * FROM productos';
@@ -130,6 +177,7 @@ cron.schedule('5 * * * * *', ()=>{
             if (dias == 5) {
                 mensaje = "El producto "+ producto.nombre+" caduca en "+dias+" dias"
                 console.log(mensaje)
+                enviar_mail(mensaje);
                 //creacion de mensaje para whatsapp
                 client.messages.create({
                     from: 'whatsapp:+14155238886',
