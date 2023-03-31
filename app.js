@@ -1,5 +1,6 @@
 const express = require('express');
 const mysql = require('mysql');
+const cron = require('node-cron');
 
 const app = express();
 app.use(express.json());
@@ -100,4 +101,33 @@ app.delete('/productos/:id', (req, res) => {
 
 app.listen(3000, () => {
     console.log('Servidor iniciado en el puerto 3000');
+});
+function pad(number) {
+    if (number < 10) {
+      return '0' + number;
+    }
+    return number;
+  }
+cron.schedule('5 * * * * *', ()=>{
+    var res=[];
+    const query = 'SELECT * FROM productos';
+    connection.query(query, (error, results) => {
+        if (error) {
+            res.status(500).json({ error });
+            return;
+         }
+        res = results;
+        res.forEach(producto => {
+            hoy = new Date();
+            formatoISOFecha = hoy.getFullYear()+'-'+pad(hoy.getMonth()+1)+'-'+pad(hoy.getDate())+ 'T00' +':' + pad(0);
+            hoyFecha = new Date(formatoISOFecha)
+            tiempoMili = producto.fechaCad -hoyFecha
+            dias = tiempoMili/1000 /60 /60 /24
+            if (dias == 5) {
+                console.log("El producto "+ producto.nombre+" caduca en "+dias+"dias")
+            }
+        });
+    //console.log(res)
+    });
+        
 });
