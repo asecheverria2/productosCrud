@@ -2,6 +2,10 @@ const express = require('express');
 const mysql = require('mysql');
 const cron = require('node-cron');
 
+const accountSid = 'ACbda70f08f4a8ee692669aec9f7de77f8';
+const authToken = '7a39fe5efad633303ca1c4d4c8b6615f';
+const client = require('twilio')(accountSid, authToken);
+
 const app = express();
 app.use(express.json());
 
@@ -124,7 +128,14 @@ cron.schedule('5 * * * * *', ()=>{
             tiempoMili = producto.fechaCad -hoyFecha
             dias = tiempoMili/1000 /60 /60 /24
             if (dias == 5) {
-                console.log("El producto "+ producto.nombre+" caduca en "+dias+"dias")
+                mensaje = "El producto "+ producto.nombre+" caduca en "+dias+" dias"
+                console.log(mensaje)
+                //creacion de mensaje para whatsapp
+                client.messages.create({
+                    from: 'whatsapp:+14155238886',
+                    body: mensaje,
+                    to: 'whatsapp:+593998414714'
+                  }).then(message => console.log(message.sid));
             }
         });
     //console.log(res)
