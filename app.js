@@ -159,7 +159,7 @@ function pad(number) {
   }
 
 //funcion para automatizar el envio de mensajes'5 * * * * *'
-cron.schedule('5 * * * * *', ()=>{
+cron.schedule('0 8 * * 0-6', ()=>{
     var res=[];
     const query = 'SELECT * FROM productos';
     connection.query(query, (error, results) => {
