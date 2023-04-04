@@ -3,7 +3,7 @@ const mysql = require('mysql');
 const cron = require('node-cron');
 
 const accountSid = 'ACbda70f08f4a8ee692669aec9f7de77f8';
-const authToken = '3126d17d868b6f93e383f63a3bce57ed';
+const authToken = '4e5224f7f816f4e42d4ce57cb0529cd8';
 const client = require('twilio')(accountSid, authToken);
 
 const nodemailer = require('nodemailer');
@@ -158,7 +158,7 @@ function pad(number) {
     return number;
   }
 
-//funcion para automatizar el envio de mensajes'5 * * * * *'
+//funcion para automatizar el envio de mensajes'5 * * * * *''0 8 * * 0-6'
 cron.schedule('0 8 * * 0-6', ()=>{
     var res=[];
     const query = 'SELECT * FROM productos';
@@ -172,8 +172,12 @@ cron.schedule('0 8 * * 0-6', ()=>{
             hoy = new Date();
             formatoISOFecha = hoy.getFullYear()+'-'+pad(hoy.getMonth()+1)+'-'+pad(hoy.getDate())+ 'T00' +':' + pad(0);
             hoyFecha = new Date(formatoISOFecha)
-            tiempoMili = producto.fechaCad -hoyFecha
+            fechaCad = new Date(producto.fechaCad+'T00' +':' + pad(0))
+            console.log(fechaCad)
+            console.log(hoyFecha)
+            tiempoMili = fechaCad -hoyFecha
             dias = tiempoMili/1000 /60 /60 /24
+            console.log(dias)
             if (dias == 5) {
                 mensaje = "El producto "+ producto.nombre+" caduca en "+dias+" dias"
                 console.log(mensaje)
