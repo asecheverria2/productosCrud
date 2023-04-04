@@ -26,6 +26,9 @@ connection.connect((error) => {
   }
   console.log('Conexión exitosa a la base de datos');
 });
+var cors = require('cors')
+
+app.use(cors()) 
 
 // Obtener todos los productos
 app.get('/productos', (req, res) => {
